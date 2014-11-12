@@ -1,24 +1,24 @@
 var Scout = require('zetta-scout');
 var util = require('util');
-var FonaPower = require('./fona_power');
+var FonaSIM = require('./fona_sim');
 
-var FonaPowerScout = module.exports = function() {
+var FonaSIMScout = module.exports = function() {
   Scout.call(this);
 };
-util.inherits(FonaPowerScout, Scout);
+util.inherits(FonaSIMScout, Scout);
 
-FonaPowerScout.prototype.init = function(next) {
-  var FonaPowerQuery = this.server.where({type: 'fona-power'});
+FonaSIMScout.prototype.init = function(next) {
+  var FonaSIMQuery = this.server.where({type: 'fona-sim'});
   var serialDeviceQuery = this.server.where({ type: 'serial' });
   
   var self = this;
 
   this.server.observe(serialDeviceQuery, function(serialDevice) {
-    self.server.find(FonaPowerQuery, function(err, results) {
+    self.server.find(FonaSIMQuery, function(err, results) {
       if (results[0]) {
-        self.provision(results[0], FonaPower, serialDevice);
+        self.provision(results[0], FonaSIM, serialDevice);
       } else {
-        self.discover(FonaPower, serialDevice);
+        self.discover(FonaSIM, serialDevice);
       }
       next();
     });

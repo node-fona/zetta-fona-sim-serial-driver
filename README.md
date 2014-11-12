@@ -1,19 +1,19 @@
-##Zetta FONA power serial device driver
+##Zetta FONA SIM serial device driver
 
 ###Install
 
 ```
-$> npm install zetta-fona-power-serial-driver
+$> npm install zetta-fona-sim-serial-driver
 ```
 
 ###Usage
 
 ```
 var zetta = require('zetta');
-var FonaPower = require('zetta-fona-power-serial-driver');
+var FonaSIM = require('zetta-fona-sim-serial-driver');
 
 zetta()
-  .use(FonaPower)
+  .use(FonaSIM)
   .listen(1337)
 ```
 
