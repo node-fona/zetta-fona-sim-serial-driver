@@ -15,7 +15,10 @@ FonaSIM.prototype.init = function(config) {
   .name('Adafruit Fona SIM')
   .type('fona-sim')
   .state('waiting')
-  .when('waiting', { allow: ['get-ccid']})
+  .when('waiting', { allow: ['get-ccid', 'unlock-sim']})
+  .map('unlock-sim', this.unlockSIM, [
+    { name: 'pin', title: 'SIM PIN', type: 'text'}
+    ])
   .map('get-ccid', this.getCCID);
 
 };
@@ -27,9 +30,9 @@ FonaSIM.prototype.getCCID = function(cb) {
   
   var tasks = [
   {    
-    regexp: /^$/,
     before: function() {self.state = 'getting-ccid'},
-    command: 'AT+CCID'
+    command: 'AT+CCID',
+    regexp: /^$/
   },
   {
     regexp: /^(\d[a-zA-Z0-9]*)$/,
@@ -39,6 +42,29 @@ FonaSIM.prototype.getCCID = function(cb) {
   },
   {
     regexp: /^$/
+  },
+  {
+    regexp: /OK/,
+    onMatch: function () {
+      self.state='waiting';
+      cb();
+    }
+  }
+  ];
+
+  this._serialDevice.enqueue(tasks, null, function() {});
+};
+
+FonaSIM.prototype.unlockSIM = function(pin, cb) {
+  this.log('unlockSIM');  
+
+  var self = this;
+  
+  var tasks = [
+  {    
+    command: 'AT+CPIN=' + pin,
+    regexp: /^$/,
+    before: function() {self.state = 'unlocking-sim'},
   },
   {
     regexp: /OK/,
